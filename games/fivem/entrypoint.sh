@@ -37,7 +37,7 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
         echo "Local changes detected. Do you want to continue? [y/N]"
         read -r response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
-          git pull --force && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+          git reset --hard origin/${GIT_BRANCH} && git pull && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
         else
           echo "Pull aborted due to local changes."
         fi
