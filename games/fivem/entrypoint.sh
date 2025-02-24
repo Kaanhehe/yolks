@@ -32,10 +32,20 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
     fi
 
     # If git origin matches the repo specified by user then pull
-    if [ "${GIT_ORIGIN}" == "${GIT_REPOURL}" ]; then #
-      git pull && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
-	else
-	  echo -e "git repository in /home/container/server-data/ does not match user provided configuration. Failed pulling /home/container/server-data/ from git."
+    if [ "${GIT_ORIGIN}" == "${GIT_REPOURL}" ]; then
+      if [ -n "$(git status --porcelain)" ]; then
+        echo "Local changes detected. Do you want to continue? [y/N]"
+        read -r response
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
+          git pull --force && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+        else
+          echo "Pull aborted due to local changes."
+        fi
+      else
+        git pull && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+      fi
+	  else
+	    echo -e "git repository in /home/container/server-data/ does not match user provided configuration. Failed pulling /home/container/server-data/ from git."
     fi
   else # No files exist in server-data folder, clone
     echo -e "server-data directory is empty. Attempting to clone git repository."
