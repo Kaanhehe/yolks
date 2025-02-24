@@ -1,12 +1,14 @@
 FROM 		--platform=$TARGETOS/$TARGETARCH ubuntu:22.04
 ENV         DEBIAN_FRONTEND=noninteractive
 
-RUN         apt update -y \
-			&& apt install -y curl ca-certificates openssl git tar gnupg2 sqlite3 fontconfig tzdata iproute2 libfreetype6 software-properties-common \
-			&& useradd -d /home/container -m container
+RUN apt-get update -y && \
+    apt-get install -y curl ca-certificates openssl git tar gnupg2 sqlite3 fontconfig tzdata iproute2 libfreetype6 software-properties-common && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN			add-apt-repository -y ppa:minetestdevs/stable
-RUN			apt update && apt -y install minetest
+RUN useradd -d /home/container -m container
+
+RUN add-apt-repository -y ppa:minetestdevs/stable
+RUN apt-get update -y && apt-get -y install minetest
 
 USER        container
 ENV         USER=container HOME=/home/container
