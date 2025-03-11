@@ -39,12 +39,12 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
         echo -e "\nDo you want to continue? [y/N]"
         read -r response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
-          git reset --hard origin/${GIT_BRANCH} && git pull --recurse-submodules && git submodule update --init --recursive && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+          git reset --hard origin/${GIT_BRANCH} && git pull --recurse-submodules && git submodule update --init --recursive --progress && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
         else
           echo "Pull aborted due to local changes."
         fi
       else
-        git pull --recurse-submodules && git submodule update --init --recursive && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+        git pull --recurse-submodules && git submodule update --init --recursive --progress && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
       fi
 	  else
 	    echo -e "git repository in /home/container/server-data/ does not match user provided configuration. Failed pulling /home/container/server-data/ from git."
