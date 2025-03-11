@@ -33,27 +33,44 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
 
     # If git origin matches the repo specified by user then pull
     if [ "${GIT_ORIGIN}" == "${GIT_REPOURL}" ]; then
+      # Update submodule URLs with credentials
+      if [ -f .gitmodules ]; then
+        echo "Updating submodule URLs with credentials..."
+        git config --file=.gitmodules --get-regexp '^submodule\..*\.url$' | while read KEY URL; do
+          # Extract the path after github.com
+          REPO_PATH=$(echo "$URL" | sed -E 's/https:\/\/github.com\/(.*)/\1/')
+          # Update submodule URL with credentials
+          NEW_URL="https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/${REPO_PATH}"
+          git config --file=.gitmodules "$(echo "$KEY")" "$NEW_URL"
+        done
+        git submodule sync
+      fi
+
       if [ -n "$(git status --porcelain)" ]; then
         echo "Local changes detected:"
         git status --porcelain
         echo -e "\nDo you want to continue? [y/N]"
         read -r response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
-          git reset --hard origin/${GIT_BRANCH} && git pull --recurse-submodules && git submodule update --init --recursive --progress && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+          git reset --hard origin/${GIT_BRANCH} && \
+          git pull --recurse-submodules && \
+          git submodule update --init --recursive --progress && \
+          echo "Finished pulling /home/container/server-data/ from git." || \
+          echo "Failed pulling /home/container/server-data/ from git."
         else
           echo "Pull aborted due to local changes."
         fi
       else
-        git pull --recurse-submodules && git submodule update --init --recursive --progress && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
+        git pull --recurse-submodules && \
+        git submodule update --init --recursive --progress && \
+        echo "Finished pulling /home/container/server-data/ from git." || \
+        echo "Failed pulling /home/container/server-data/ from git."
       fi
-	  else
-	    echo -e "git repository in /home/container/server-data/ does not match user provided configuration. Failed pulling /home/container/server-data/ from git."
-    fi
   else # No files exist in server-data folder, clone
     echo -e "server-data directory is empty. Attempting to clone git repository."
     if [ -z ${GIT_BRANCH} ]; then
       echo -e "Cloning default branch into /home/container/server-data/."
-      git clone ${GIT_REPOURL} .
+      git clone ${GIT_REPOURL} . && echo "Finished cloning into /home/container/server-data/ from git." || echo "Failed cloning into /home/container/server-data/ from git."
     else
       echo -e "Cloning ${GIT_BRANCH} branch into /home/container/server-data/."
       git clone --single-branch --branch ${GIT_BRANCH} ${GIT_REPOURL} . && echo "Finished cloning into /home/container/server-data/ from git." || echo "Failed cloning into /home/container/server-data/ from git."
