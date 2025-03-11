@@ -34,7 +34,9 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
     # If git origin matches the repo specified by user then pull
     if [ "${GIT_ORIGIN}" == "${GIT_REPOURL}" ]; then
       if [ -n "$(git status --porcelain)" ]; then
-        echo "Local changes detected. Do you want to continue? [y/N]"
+        echo "Local changes detected:"
+        git status --porcelain
+        echo -e "\nDo you want to continue? [y/N]"
         read -r response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
           git reset --hard origin/${GIT_BRANCH} && git pull --recurse-submodules && git submodule update --init --recursive && echo "Finished pulling /home/container/server-data/ from git." || echo "Failed pulling /home/container/server-data/ from git."
