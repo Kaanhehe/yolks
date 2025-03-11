@@ -66,6 +66,7 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
         echo "Finished pulling /home/container/server-data/ from git." || \
         echo "Failed pulling /home/container/server-data/ from git."
       fi
+    fi
   else # No files exist in server-data folder, clone
     echo -e "server-data directory is empty. Attempting to clone git repository."
     if [ -z ${GIT_BRANCH} ]; then
