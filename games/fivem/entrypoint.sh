@@ -46,9 +46,9 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
         git submodule sync
       fi
 
-      if [ -n "$(git status --porcelain)" ]; then
+      if [ -n "$(git status --porcelain -uno)" ]; then
         echo "Local changes detected:"
-        git status --porcelain
+        git status --porcelain -uno
         echo -e "\nDo you want to continue? [y/N]"
         read -r response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
