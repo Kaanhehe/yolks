@@ -33,18 +33,6 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
 
     # If git origin matches the repo specified by user then pull
     if [ "${GIT_ORIGIN}" == "${GIT_REPOURL}" ]; then
-      # Update submodule URLs with credentials
-      if [ -f .gitmodules ]; then
-        echo "Updating submodule URLs with credentials..."
-        git config --file=.gitmodules --get-regexp '^submodule\..*\.url$' | while read KEY URL; do
-          # Extract the path after github.com
-          REPO_PATH=$(echo "$URL" | sed -E 's/https:\/\/github.com\/(.*)/\1/')
-          # Update submodule URL with credentials
-          NEW_URL="https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/${REPO_PATH}"
-          git config --file=.gitmodules "$(echo "$KEY")" "$NEW_URL"
-        done
-        git submodule sync
-      fi
 
       if [ -n "$(git status --porcelain -uno)" ]; then
         echo "Local changes detected:"
