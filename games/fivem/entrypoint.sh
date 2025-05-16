@@ -17,9 +17,9 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
 
   # Configure git for large repos
   git config --global core.preloadindex true     # Preload index into memory for faster operations
-  git config --global core.fsyncObjectFiles false # Reduce disk I/O
+  git config --global core.fsync all            # Reduce disk I/O
   git config --global maintenance.auto false      # Prevent background maintenance
-  git config --global index.threads 4            # Use multiple threads for indexing
+  git config --global index.threads 8            # Use multiple threads for indexing
 
   if [ -z "${GIT_USERNAME}" ] && [ -z "${GIT_TOKEN}" ]; then # Check for git username & token
     echo -e "git Username or git Token was not specified."
