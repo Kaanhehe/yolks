@@ -33,26 +33,34 @@ if [ "${GIT_ENABLED}" == "true" ] || [ "${GIT_ENABLED}" == "1" ]; then
 
     # If git origin matches the repo specified by user then pull
     if [ "${GIT_ORIGIN}" == "${GIT_REPOURL}" ]; then
-
-      if [ -n "$(git status --porcelain -uno)" ]; then
-        echo "Local changes detected:"
-        git status --porcelain -uno
-        echo -e "\nDo you want to continue? [y/N]"
-        read -r response
-        if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
-          git reset --hard origin/${GIT_BRANCH} && \
+      # Update remote refs
+      echo "Checking for updates..."
+      git remote update || echo "Failed to fetch updates from remote repository"
+      
+      # Check if we're behind remote
+      if [[ $(git status -uno | grep 'Your branch is behind') ]]; then
+        if [ -n "$(git status --porcelain -uno)" ]; then
+          echo "Local changes detected:"
+          git status --porcelain -uno
+          echo -e "\nDo you want to continue? [y/N]"
+          read -r response
+          if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
+            git reset --hard origin/${GIT_BRANCH} && \
+            git pull --recurse-submodules && \
+            git submodule update --init --recursive --progress && \
+            echo "Finished pulling /home/container/server-data/ from git." || \
+            echo "Failed pulling /home/container/server-data/ from git."
+          else
+            echo "Pull aborted due to local changes."
+          fi
+        else
           git pull --recurse-submodules && \
           git submodule update --init --recursive --progress && \
           echo "Finished pulling /home/container/server-data/ from git." || \
           echo "Failed pulling /home/container/server-data/ from git."
-        else
-          echo "Pull aborted due to local changes."
         fi
       else
-        git pull --recurse-submodules && \
-        git submodule update --init --recursive --progress && \
-        echo "Finished pulling /home/container/server-data/ from git." || \
-        echo "Failed pulling /home/container/server-data/ from git."
+        echo "Repository is already up to date."
       fi
     fi
   else # No files exist in server-data folder, clone
